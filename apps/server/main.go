@@ -110,7 +110,7 @@ func addConn2Pool(conn *net.TCPConn) {
 	connectionPoolLock.Lock()
 	defer connectionPoolLock.Unlock()
 	now := time.Now()
-	connectionPool[strconv.FormatInt(now.UnixNano(), 0)] = &ConnMatch{
+	connectionPool[strconv.FormatInt(now.UnixNano(), 10)] = &ConnMatch{
 		addTime: now,
 		accept:  conn,
 	}
