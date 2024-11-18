@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	localServerAddr   = "127.0.0.1:32768"  // 本地需要暴露的服务端口
+	localServerAddr   = "127.0.0.1:8080"   // 本地需要暴露的服务端口
 	remoteIP          = "10.0.3.15"        // 远端的IP地址
 	remoteControlAddr = remoteIP + ":8009" // 远端的服务控制通道,用来传递控制信息,如出现新连接和心跳
 	remoteServerAddr  = remoteIP + ":8008" // 远端服务端口,用来建立隧道
