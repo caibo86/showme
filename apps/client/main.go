@@ -10,6 +10,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/caibo86/logger"
 	"io"
 	"net"
 	"showme/network"
@@ -23,6 +24,7 @@ var (
 )
 
 func main() {
+	logger.Init()
 	tcpConn, err := network.CreateTCPConn(remoteControlAddr)
 	if err != nil {
 		fmt.Printf("[连接失败] %s %s\n", remoteControlAddr, err)
