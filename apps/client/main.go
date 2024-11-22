@@ -9,7 +9,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"github.com/caibo86/logger"
 	"io"
 	"net"
@@ -25,12 +24,15 @@ var (
 
 func main() {
 	logger.Init()
+	defer func() {
+		_ = logger.Close()
+	}()
 	tcpConn, err := network.CreateTCPConn(remoteControlAddr)
 	if err != nil {
-		fmt.Printf("[连接失败] %s %s\n", remoteControlAddr, err)
+		logger.Errorf("[连接失败] %s %s\n", remoteControlAddr, err)
 		return
 	}
-	fmt.Printf("[连接成功] %s\n", remoteControlAddr)
+	logger.Infof("[连接成功] %s\n", remoteControlAddr)
 	reader := bufio.NewReader(tcpConn)
 	for {
 		var s string
@@ -43,7 +45,7 @@ func main() {
 			go connectLocalAndRemote()
 		}
 	}
-	fmt.Printf("[连接断开] %s\n", remoteControlAddr)
+	logger.Infof("[连接断开] %s\n", remoteControlAddr)
 }
 
 func connectLocalAndRemote() {
@@ -62,7 +64,7 @@ func connectLocalAndRemote() {
 func connectLocal() *net.TCPConn {
 	conn, err := network.CreateTCPConn(localServerAddr)
 	if err != nil {
-		fmt.Printf("[连接本地服务失败] %s\n", err)
+		logger.Errorf("[连接本地服务失败] %s\n", err)
 		return nil
 	}
 	return conn
@@ -71,7 +73,7 @@ func connectLocal() *net.TCPConn {
 func connectRemote() *net.TCPConn {
 	conn, err := network.CreateTCPConn(remoteServerAddr)
 	if err != nil {
-		fmt.Printf("[连接远端服务失败] %s\n", err)
+		logger.Errorf("[连接远端服务失败] %s\n", err)
 		return nil
 	}
 	return conn

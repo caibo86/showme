@@ -8,7 +8,9 @@
 package main
 
 import (
-	"fmt"
+	"github.com/caibo86/config"
+	"github.com/caibo86/logger"
+	"github.com/caibo86/misc"
 	"net"
 	"showme/network"
 	"strconv"
@@ -24,17 +26,17 @@ const (
 
 var (
 	clientConn         *net.TCPConn
-	connectionPool     map[string]*ConnMatch
+	connectionPool     map[string]*ClientConn
 	connectionPoolLock sync.Mutex
 )
 
-type ConnMatch struct {
-	addTime time.Time
-	accept  *net.TCPConn
-}
-
 func main() {
-	connectionPool = make(map[string]*ConnMatch, 32)
+	config.Load(misc.GetPathInRootDir("config/server.yaml"), &Config{})
+	logger.Init()
+	defer func() {
+		_ = logger.Close()
+	}()
+	connectionPool = make(map[string]*ClientConn, 32)
 	go createControlChannel()
 	go acceptUserRequest()
 	go acceptClientRequest()
@@ -47,15 +49,15 @@ func createControlChannel() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("[已监听客户端连接] %s\n", controlAddr)
+	logger.Infof("[已监听客户端连接] %s\n", controlAddr)
 	for {
 		var tcpConn *net.TCPConn
 		tcpConn, err = tcpListener.AcceptTCP()
 		if err != nil {
-			fmt.Printf("[客户端连接接收失败] %s\n", err)
+			logger.Errorf("[客户端连接接收失败] %s\n", err)
 			continue
 		}
-		fmt.Printf("[新客户端连接] %s\n", tcpConn.RemoteAddr().String())
+		logger.Infof("[新客户端连接] %s\n", tcpConn.RemoteAddr().String())
 		// 如果当前已经有一个客户端存在,则丢弃这个连接
 		if clientConn != nil {
 			_ = tcpConn.Close()
@@ -74,7 +76,7 @@ func keepAlive() {
 		}
 		_, err := clientConn.Write([]byte(network.KeepAlive + "\n"))
 		if err != nil {
-			fmt.Printf("[客户端心跳失败] %s %s\n", clientConn.RemoteAddr(), err)
+			logger.Errorf("[客户端心跳失败] %s %s\n", clientConn.RemoteAddr(), err)
 			clientConn = nil
 			return
 		}
@@ -88,7 +90,7 @@ func acceptUserRequest() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("[用户已监听] %s\n", visitAddr)
+	logger.Infof("[用户已监听] %s\n", visitAddr)
 	defer func() {
 		_ = tcpListener.Close()
 	}()
@@ -96,10 +98,10 @@ func acceptUserRequest() {
 		var tcpConn *net.TCPConn
 		tcpConn, err = tcpListener.AcceptTCP()
 		if err != nil {
-			fmt.Printf("[用户接收失败] %s\n", err)
+			logger.Errorf("[用户接收失败] %s\n", err)
 			continue
 		}
-		fmt.Printf("[新用户连接] %s\n", tcpConn.RemoteAddr().String())
+		logger.Infof("[新用户连接] %s\n", tcpConn.RemoteAddr().String())
 		addConn2Pool(tcpConn)
 		sendMessage(network.NewConnection + "\n")
 	}
@@ -110,7 +112,7 @@ func addConn2Pool(conn *net.TCPConn) {
 	connectionPoolLock.Lock()
 	defer connectionPoolLock.Unlock()
 	now := time.Now()
-	connectionPool[strconv.FormatInt(now.UnixNano(), 10)] = &ConnMatch{
+	connectionPool[strconv.FormatInt(now.UnixNano(), 10)] = &ClientConn{
 		addTime: now,
 		accept:  conn,
 	}
@@ -119,12 +121,12 @@ func addConn2Pool(conn *net.TCPConn) {
 // 给客户端发送消息
 func sendMessage(msg string) {
 	if clientConn == nil {
-		fmt.Printf("[客户端未连接] %s\n", msg)
+		logger.Errorf("[客户端未连接] %s\n", msg)
 		return
 	}
 	_, err := clientConn.Write([]byte(msg))
 	if err != nil {
-		fmt.Printf("[消息发送失败] %s %s\n", msg, err)
+		logger.Errorf("[消息发送失败] %s %s\n", msg, err)
 	}
 }
 
@@ -134,7 +136,7 @@ func acceptClientRequest() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("[已监听客户端请求] %s\n", tunnelAddr)
+	logger.Infof("[已监听客户端请求] %s\n", tunnelAddr)
 	defer func() {
 		_ = tcpListener.Close()
 	}()
@@ -142,10 +144,10 @@ func acceptClientRequest() {
 		var tcpConn *net.TCPConn
 		tcpConn, err = tcpListener.AcceptTCP()
 		if err != nil {
-			fmt.Printf("[客户端请求接收失败] %s\n", err)
+			logger.Errorf("[客户端请求接收失败] %s\n", err)
 			continue
 		}
-		fmt.Printf("[新客户端请求] %s\n", tcpConn.RemoteAddr().String())
+		logger.Infof("[新客户端请求] %s\n", tcpConn.RemoteAddr().String())
 		go establishTunnel(tcpConn)
 	}
 }
