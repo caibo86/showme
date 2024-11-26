@@ -8,6 +8,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/caibo86/cberrors"
 	"github.com/caibo86/logger"
 	"io"
@@ -81,12 +82,14 @@ func (server *Server) createAgentChannel() {
 		_ = listener.Close()
 	}()
 	for {
+		fmt.Println("进来了吗")
 		var conn *net.TCPConn
 		conn, err = listener.AcceptTCP()
 		if err != nil {
 			logger.Errorf("agent accept err %s", err)
 			continue
 		}
+		fmt.Println("有连接进来吗")
 		logger.Infof("agent accepted %s", conn.RemoteAddr())
 		server.addAgentConn(conn)
 	}
