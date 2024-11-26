@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/caibo86/cberrors v1.0.0
 	github.com/caibo86/config v1.0.0
-	github.com/caibo86/logger v1.0.3
+	github.com/caibo86/logger v1.0.4
 	github.com/caibo86/misc v0.0.0-20241121094201-fb93961bbe21
 )
 
