@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	KeepAlive     = "KEEP_ALIVE"
-	NewConnection = "NEW_CONNECTION"
+	KeepAlive     = "KEEP_ALIVE\n"
+	NewConnection = "NEW_CONNECTION\n"
 )
 
 func CreateTCPListener(addr string) (*net.TCPListener, error) {

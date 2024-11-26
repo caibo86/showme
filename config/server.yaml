@@ -1,0 +1,4 @@
+server:
+  agentAddr: "0.0.0.0:9000"
+  tunnelAddr: "0.0.0.0:9001"
+  clientAddr: "0.0.0.0:9002"

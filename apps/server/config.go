@@ -16,16 +16,16 @@ const ServerConfigType = "server"
 
 // Config 配置
 type Config struct {
-	AgentPort      int32 `yaml:"agentPort"`      // 代理监听端口
-	TunnelPort     int32 `yaml:"tunnelPort"`     // 隧道监听端口
-	ClientPort     int32 `yaml:"clientPort"`     // 客户端监听端口
-	MaxClientLimit int32 `yaml:"maxClientLimit"` // 最大客户端数
-	MaxAgentLimit  int32 `yaml:"maxAgentLimit"`  // 最大代理数
+	AgentAddr      string `yaml:"agentAddr"`      // 代理监听地址
+	TunnelAddr     string `yaml:"tunnelAddr"`     // 隧道监听地址
+	ClientAddr     string `yaml:"clientAddr"`     // 客户端监听地址
+	MaxClientLimit int    `yaml:"maxClientLimit"` // 最大客户端数
+	MaxAgentLimit  int    `yaml:"maxAgentLimit"`  // 最大代理数
 }
 
 // GetType implements IConfig
 func (config *Config) GetType() string {
-	return "ServerConfigType"
+	return ServerConfigType
 }
 
 // GetConfig 获取配置
