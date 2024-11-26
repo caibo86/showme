@@ -4,8 +4,8 @@ github.com/caibo86/cberrors v1.0.0 h1:NydPGlEmpIsN4xq1cPM5VeOqtDJXJLZB/j3keL1Tns
 github.com/caibo86/cberrors v1.0.0/go.mod h1:HCp2dEKYVtl4JV1os9dOi9n8xFDsioImPlDXzdPbKuI=
 github.com/caibo86/config v1.0.0 h1:YLBXLSpfc5tcV5l+MLH9qu6mgFZOpx7iy3Kf/kH8kS4=
 github.com/caibo86/config v1.0.0/go.mod h1:hJjJqJf8k/h1tLi5vPOhzahXZpPR4ek58cVhdtPdYz0=
-github.com/caibo86/logger v1.0.1 h1:pp/V/ym3mHnQ4y+vk6QuYhErdwpubwYkzkuY1Pdk1hM=
-github.com/caibo86/logger v1.0.1/go.mod h1:fTOUfXy0gfoPDdYMsv4IbGgBD9fdDPyQ6TOUZZBmEf0=
+github.com/caibo86/logger v1.0.2 h1:SNcx5MaDoACdfnGRM1Zd94VfuDOeBrHX3we2La1CIUM=
+github.com/caibo86/logger v1.0.2/go.mod h1:fTOUfXy0gfoPDdYMsv4IbGgBD9fdDPyQ6TOUZZBmEf0=
 github.com/caibo86/misc v0.0.0-20241121094201-fb93961bbe21 h1:Qe/E1eBG/iZA4/mWkzDAsNfrPrYL4hmaSweVN8iujcA=
 github.com/caibo86/misc v0.0.0-20241121094201-fb93961bbe21/go.mod h1:+RB0utGc/13nmSXuDrMfVLNDKPhAnjUES/qEHSNuREI=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

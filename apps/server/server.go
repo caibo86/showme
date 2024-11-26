@@ -48,6 +48,7 @@ func (server *Server) run() {
 	logger.Infof("server start")
 	go server.keepAgentAlive()
 	go server.createAgentChannel()
+	go server.createTunnelChannel()
 	server.createClientChannel()
 }
 
