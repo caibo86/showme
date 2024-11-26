@@ -24,12 +24,13 @@ type Tunnel struct {
 // Agent 内外代理
 type Agent struct {
 	*Config // 配置
-	tunnels map[int32]*Tunnel
+	Tunnels map[int32]*Tunnel
 }
 
 func NewAgent() *Agent {
 	ret := &Agent{
-		Config: GetConfig(),
+		Config:  GetConfig(),
+		Tunnels: make(map[int32]*Tunnel),
 	}
 	return ret
 }
@@ -74,12 +75,12 @@ func (agent *Agent) createTunnels() {
 			_ = local.Close()
 			return
 		}
-		agent.tunnels[int32(i)] = &Tunnel{
+		agent.Tunnels[int32(i)] = &Tunnel{
 			ID:     int32(i),
 			Local:  local,
 			Remote: remote,
 		}
 		network.Join2Conn(local, remote)
 	}
-	logger.Infof("create %d tunnels success", len(agent.tunnels))
+	logger.Infof("create %d tunnels success", len(agent.Tunnels))
 }

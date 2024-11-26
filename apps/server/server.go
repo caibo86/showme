@@ -54,7 +54,7 @@ func (server *Server) run() {
 
 func (server *Server) keepAgentAlive() {
 	for {
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 30)
 		server.AgentLock.Lock()
 		logger.Infof("current agent count %d", len(server.AgentConns))
 		for k, conn := range server.AgentConns {

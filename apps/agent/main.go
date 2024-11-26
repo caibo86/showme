@@ -1,6 +1,6 @@
 // -------------------------------------------
 // @file      : main.go
-// @author    : 蔡波
+// @author    : bo cai
 // @contact   : caibo923@gmail.com
 // @time      : 2024/11/15 下午4:01
 // -------------------------------------------
@@ -20,7 +20,9 @@ func main() {
 		cberrors.Panic("config is nil")
 		return
 	}
-	logger.Init()
+	logger.Init(
+		logger.SetIsRedirectErr(false),
+	)
 	defer func() {
 		_ = logger.Close()
 	}()
