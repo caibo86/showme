@@ -201,8 +201,9 @@ func (server *Server) getTunnelConn() *net.TCPConn {
 	var conn *net.TCPConn
 	server.TunnelLock.Lock()
 	defer server.TunnelLock.Unlock()
-	for _, c := range server.TunnelConns {
+	for key, c := range server.TunnelConns {
 		conn = c
+		delete(server.TunnelConns, key)
 		break
 	}
 	return conn
