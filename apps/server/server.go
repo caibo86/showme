@@ -144,6 +144,7 @@ func (server *Server) tunnelClient(client *net.TCPConn) {
 			logger.Errorf("copy tunnel to client err %s", err)
 		}
 		wg.Done()
+		logger.Infof("src tunnel closed")
 	}()
 	go func() {
 		_, err := io.Copy(tunnel, client)
@@ -151,6 +152,7 @@ func (server *Server) tunnelClient(client *net.TCPConn) {
 			logger.Errorf("copy client to tunnel err %s", err)
 		}
 		wg.Done()
+		logger.Infof("src client closed")
 	}()
 	wg.Wait()
 	logger.Infof("close tunnel client %s to %s", client.RemoteAddr(), tunnel.RemoteAddr())
