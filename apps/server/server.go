@@ -198,6 +198,7 @@ func (server *Server) getTunnelConn() *net.TCPConn {
 	logger.Infof("try to get tunnel conn")
 	var conn *net.TCPConn
 	defer func() {
+		logger.Infof("try to clear tunnel conn")
 		// 如果有连接,清空一下
 		if conn != nil {
 			clearTCPConn(conn)
