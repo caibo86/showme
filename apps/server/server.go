@@ -47,6 +47,7 @@ func NewServer() *Server {
 func (server *Server) run() {
 	logger.Infof("server start")
 	go server.keepAgentAlive()
+	go server.tunnelStatus()
 	go server.createAgentChannel()
 	go server.createTunnelChannel()
 	server.createClientChannel()
@@ -225,5 +226,12 @@ func clearTCPConn(conn *net.TCPConn) {
 	err = conn.SetReadDeadline(time.Time{})
 	if err != nil {
 		logger.Errorf("clear read deadline err %s", err)
+	}
+}
+
+func (server *Server) tunnelStatus() {
+	for {
+		time.Sleep(time.Second * 30)
+		logger.Infof("current tunnel count %d", len(server.TunnelConns))
 	}
 }

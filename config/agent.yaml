@@ -2,4 +2,4 @@ agent:
   serverAddr: "10.23.50.144:9900" # 外网服务器地址
   tunnelAddr: "10.23.50.144:9901" # 创建隧道地址
   serviceAddr: "127.0.0.1:8080" # 内网服务地址
-  tunnelLimit: 10 # 隧道池大小
+  tunnelLimit: 20 # 隧道池大小
