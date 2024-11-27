@@ -224,7 +224,6 @@ func (server *Server) newClientNtf() {
 		break
 	}
 	if conn == nil {
-		logger.Errorf("no agent connection")
 		return
 	}
 	_, err := conn.Write([]byte(network.NewConnection))
