@@ -153,10 +153,10 @@ func (server *Server) tunnelClient(client *net.TCPConn) {
 		}
 		wg.Done()
 		logger.Infof("src client closed")
+		_ = client.Close()
 	}()
 	wg.Wait()
 	logger.Infof("close tunnel client %s to %s", client.RemoteAddr(), tunnel.RemoteAddr())
-	_ = client.Close()
 	server.addTunnelConn(tunnel)
 }
 
