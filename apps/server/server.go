@@ -8,7 +8,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/caibo86/cberrors"
 	"github.com/caibo86/logger"
 	"io"
@@ -72,7 +71,7 @@ func (server *Server) keepAgentAlive() {
 
 // 启动代理监听
 func (server *Server) createAgentChannel() {
-	listener, err := network.CreateTCPListener(server.Config.AgentAddr)
+	listener, err := network.TCPListener(server.Config.AgentAddr)
 	if err != nil {
 		cberrors.PanicWrap(err)
 		return
@@ -82,14 +81,12 @@ func (server *Server) createAgentChannel() {
 		_ = listener.Close()
 	}()
 	for {
-		fmt.Println("进来了吗")
 		var conn *net.TCPConn
 		conn, err = listener.AcceptTCP()
 		if err != nil {
 			logger.Errorf("agent accept err %s", err)
 			continue
 		}
-		fmt.Println("有连接进来吗")
 		logger.Infof("agent accepted %s", conn.RemoteAddr())
 		server.addAgentConn(conn)
 	}
@@ -111,7 +108,7 @@ func (server *Server) addAgentConn(conn *net.TCPConn) bool {
 
 // 启动客户端监听
 func (server *Server) createClientChannel() {
-	listener, err := network.CreateTCPListener(server.Config.ClientAddr)
+	listener, err := network.TCPListener(server.Config.ClientAddr)
 	if err != nil {
 		cberrors.PanicWrap(err)
 		return
@@ -162,7 +159,7 @@ func (server *Server) tunnelClient(client *net.TCPConn) {
 
 // 启动代理隧道监听
 func (server *Server) createTunnelChannel() {
-	listener, err := network.CreateTCPListener(server.Config.TunnelAddr)
+	listener, err := network.TCPListener(server.Config.TunnelAddr)
 	if err != nil {
 		cberrors.PanicWrap(err)
 		return

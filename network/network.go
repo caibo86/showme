@@ -18,7 +18,7 @@ const (
 	NewConnection = "NEW_CONNECTION\n"
 )
 
-func CreateTCPListener(addr string) (*net.TCPListener, error) {
+func TCPListener(addr string) (*net.TCPListener, error) {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
 		return nil, err

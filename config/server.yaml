@@ -1,4 +1,6 @@
 server:
-  agentAddr: "0.0.0.0:9900"
-  tunnelAddr: "0.0.0.0:9901"
-  clientAddr: "0.0.0.0:9902"
+  agentAddr: "0.0.0.0:9900" # 代理监听端口
+  tunnelAddr: "0.0.0.0:9901" # 隧道监听端口
+  clientAddr: "0.0.0.0:9902" # 客户端监听端口
+  maxAgentLimit: 10 # 最大代理连接数
+  maxClientLimit: 100 # 最大客户端连接数

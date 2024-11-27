@@ -69,9 +69,9 @@ func (agent *Agent) createTunnels() {
 			logger.Errorf("connect to service %s err %s", agent.Config.ServiceAddr, err)
 			return
 		}
-		remote, err = network.CreateTCPConn(agent.Config.ServerAddr)
+		remote, err = network.CreateTCPConn(agent.Config.TunnelAddr)
 		if err != nil {
-			logger.Errorf("connect to server %s err %s", agent.Config.ServerAddr, err)
+			logger.Errorf("connect to server %s err %s", agent.Config.TunnelAddr, err)
 			_ = local.Close()
 			return
 		}
