@@ -10,7 +10,6 @@ package main
 import (
 	"github.com/caibo86/cberrors"
 	"github.com/caibo86/logger"
-	"io"
 	"net"
 	"showme/network"
 	"sync"
@@ -128,22 +127,7 @@ func (server *Server) tunnelClient(client *net.TCPConn) {
 		return
 	}
 	logger.Infof("tunnel client %s to %s", client.RemoteAddr(), tunnel.RemoteAddr())
-	go func() {
-		_, err := io.Copy(client, tunnel)
-		if err != nil {
-			logger.Warnf("copy tunnel to client err %s", err)
-		}
-		logger.Infof("src tunnel closed")
-	}()
-	go func() {
-		_, err := io.Copy(tunnel, client)
-		if err != nil {
-			logger.Errorf("copy client to tunnel err %s", err)
-		}
-		logger.Infof("src client closed")
-		_ = client.Close()
-		_ = tunnel.Close()
-	}()
+	network.Join2Conn(client, tunnel)
 }
 
 // 启动代理隧道监听

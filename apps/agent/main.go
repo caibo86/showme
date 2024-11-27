@@ -27,6 +27,6 @@ func main() {
 		_ = logger.Close()
 	}()
 	agent := NewAgent()
-	agent.createTunnels()
+	agent.createTunnels(agent.Config.TunnelLimit)
 	agent.run()
 }
