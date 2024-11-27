@@ -17,12 +17,6 @@ import (
 	"time"
 )
 
-// ClientConn 用户连接
-type ClientConn struct {
-	addTime time.Time    // 创建时间
-	conn    *net.TCPConn // tcp连接
-}
-
 // Server 公网服务端
 type Server struct {
 	Config      *Config // 配置
@@ -30,7 +24,6 @@ type Server struct {
 	AgentLock   sync.Mutex
 	TunnelConns map[string]*net.TCPConn
 	TunnelLock  sync.Mutex
-	ClientConns map[string]*ClientConn
 }
 
 // NewServer 创建服务器
@@ -39,7 +32,6 @@ func NewServer() *Server {
 		Config:      GetConfig(),
 		AgentConns:  make(map[string]*net.TCPConn),
 		TunnelConns: make(map[string]*net.TCPConn),
-		ClientConns: make(map[string]*ClientConn),
 	}
 }
 
@@ -97,9 +89,9 @@ func (server *Server) createAgentChannel() {
 func (server *Server) addAgentConn(conn *net.TCPConn) bool {
 	server.AgentLock.Lock()
 	defer server.AgentLock.Unlock()
-	if len(server.AgentConns) >= server.Config.MaxAgentLimit {
+	if len(server.AgentConns) >= server.Config.AgentLimit {
 		logger.Errorf("agent connection limit reached %d, abandon %s",
-			server.Config.MaxAgentLimit, conn.RemoteAddr())
+			server.Config.AgentLimit, conn.RemoteAddr())
 		_ = conn.Close()
 		return false
 	}
@@ -136,14 +128,11 @@ func (server *Server) tunnelClient(client *net.TCPConn) {
 		return
 	}
 	logger.Infof("tunnel client %s to %s", client.RemoteAddr(), tunnel.RemoteAddr())
-	var wg sync.WaitGroup
-	wg.Add(2)
 	go func() {
 		_, err := io.Copy(client, tunnel)
 		if err != nil {
-			logger.Errorf("copy tunnel to client err %s", err)
+			logger.Warnf("copy tunnel to client err %s", err)
 		}
-		wg.Done()
 		logger.Infof("src tunnel closed")
 	}()
 	go func() {
@@ -151,13 +140,10 @@ func (server *Server) tunnelClient(client *net.TCPConn) {
 		if err != nil {
 			logger.Errorf("copy client to tunnel err %s", err)
 		}
-		wg.Done()
 		logger.Infof("src client closed")
 		_ = client.Close()
+		_ = tunnel.Close()
 	}()
-	wg.Wait()
-	logger.Infof("close tunnel client %s to %s", client.RemoteAddr(), tunnel.RemoteAddr())
-	server.addTunnelConn(tunnel)
 }
 
 // 启动代理隧道监听
@@ -182,7 +168,6 @@ func (server *Server) createTunnelChannel() {
 
 // 添加隧道连接
 func (server *Server) addTunnelConn(conn *net.TCPConn) {
-	clearTCPConn(conn)
 	server.TunnelLock.Lock()
 	defer server.TunnelLock.Unlock()
 	key := conn.RemoteAddr().String()
@@ -211,30 +196,39 @@ func (server *Server) getTunnelConn() *net.TCPConn {
 	return conn
 }
 
-// 清空一下TCPConn
-func clearTCPConn(conn *net.TCPConn) {
-	err := conn.SetReadDeadline(time.Now().Add(time.Second))
-	if err != nil {
-		logger.Errorf("set read deadline err %s", err)
-		return
-	}
-	buffer := make([]byte, 1024)
+func (server *Server) tunnelStatus() {
+	var i int64
 	for {
-		_, err := conn.Read(buffer)
-		if err != nil {
-			break
+		time.Sleep(time.Second * 2)
+		count := len(server.TunnelConns)
+		if i%15 == 0 {
+			logger.Infof("current tunnel count %d", count)
 		}
-	}
-	logger.Infof("clear tcp conn %s", conn.RemoteAddr())
-	err = conn.SetReadDeadline(time.Time{})
-	if err != nil {
-		logger.Errorf("clear read deadline err %s", err)
+		i += 1
+		if count < server.Config.TunnelLimit {
+			for j := count; j < server.Config.TunnelLimit; j++ {
+				server.newClientNtf()
+			}
+		}
+
 	}
 }
 
-func (server *Server) tunnelStatus() {
-	for {
-		time.Sleep(time.Second * 30)
-		logger.Infof("current tunnel count %d", len(server.TunnelConns))
+// 通知代理有新客户端连接
+func (server *Server) newClientNtf() {
+	server.AgentLock.Lock()
+	defer server.AgentLock.Unlock()
+	var conn *net.TCPConn
+	for _, c := range server.AgentConns {
+		conn = c
+		break
+	}
+	if conn == nil {
+		logger.Errorf("no agent connection")
+		return
+	}
+	_, err := conn.Write([]byte(network.NewConnection))
+	if err != nil {
+		logger.Errorf("notify agent new client err %s", err)
 	}
 }

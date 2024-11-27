@@ -8,8 +8,8 @@
 package network
 
 import (
+	"github.com/caibo86/logger"
 	"io"
-	"log"
 	"net"
 )
 
@@ -35,18 +35,23 @@ func CreateTCPConn(addr string) (*net.TCPConn, error) {
 }
 
 func Join2Conn(local *net.TCPConn, remote *net.TCPConn) {
-	go joinConn(local, remote)
-	go joinConn(remote, local)
+	go join2Conn(local, remote)
+	go join2Conn(remote, local)
 }
 
-func joinConn(local *net.TCPConn, remote *net.TCPConn) {
+func join2Conn(local *net.TCPConn, remote *net.TCPConn) {
 	defer func() {
-		_ = remote.Close()
-		_ = local.Close()
+		err := remote.Close()
+		if err == nil {
+			logger.Infof("close remote %s", remote.RemoteAddr())
+		}
+		err = local.Close()
+		if err == nil {
+			logger.Infof("close local %s", local.RemoteAddr())
+		}
 	}()
 	_, err := io.Copy(local, remote)
 	if err != nil {
-		log.Println("copy failed:", err)
 		return
 	}
 }

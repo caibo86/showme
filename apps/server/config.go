@@ -16,11 +16,11 @@ const ServerConfigType = "server"
 
 // Config 配置
 type Config struct {
-	AgentAddr      string `yaml:"agentAddr"`      // 代理监听地址
-	TunnelAddr     string `yaml:"tunnelAddr"`     // 隧道监听地址
-	ClientAddr     string `yaml:"clientAddr"`     // 客户端监听地址
-	MaxClientLimit int    `yaml:"maxClientLimit"` // 最大客户端数
-	MaxAgentLimit  int    `yaml:"maxAgentLimit"`  // 最大代理数
+	AgentAddr   string `yaml:"agentAddr"`   // 代理监听地址
+	TunnelAddr  string `yaml:"tunnelAddr"`  // 隧道监听地址
+	ClientAddr  string `yaml:"clientAddr"`  // 客户端监听地址
+	AgentLimit  int    `yaml:"agentLimit"`  // 最大代理数
+	TunnelLimit int    `yaml:"tunnelLimit"` // 最大隧道数
 }
 
 // GetType implements IConfig
