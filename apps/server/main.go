@@ -20,7 +20,9 @@ func main() {
 		cberrors.Panic("config is nil")
 		return
 	}
-	logger.Init()
+	logger.Init(
+		logger.SetIsRedirectErr(false),
+	)
 	defer func() {
 		_ = logger.Close()
 	}()
