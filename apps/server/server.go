@@ -118,10 +118,10 @@ func (server *Server) createClientChannel() {
 		var conn *net.TCPConn
 		conn, err = listener.AcceptTCP()
 		if err != nil {
-			logger.Errorf("agent accept err %s", err)
+			logger.Errorf("client accept err %s", err)
 			continue
 		}
-		logger.Infof("agent accepted %s", conn.RemoteAddr())
+		logger.Infof("client accepted %s", conn.RemoteAddr())
 		go server.tunnelClient(conn)
 	}
 }
@@ -169,10 +169,10 @@ func (server *Server) createTunnelChannel() {
 		var conn *net.TCPConn
 		conn, err = listener.AcceptTCP()
 		if err != nil {
-			logger.Errorf("agent accept err %s", err)
+			logger.Errorf("tunnel accept err %s", err)
 			continue
 		}
-		logger.Infof("agent accepted %s", conn.RemoteAddr())
+		logger.Infof("tunnel accepted %s", conn.RemoteAddr())
 		server.addTunnelConn(conn)
 	}
 }
@@ -195,12 +195,14 @@ func (server *Server) addTunnelConn(conn *net.TCPConn) {
 
 // 获取隧道连接
 func (server *Server) getTunnelConn() *net.TCPConn {
+	logger.Infof("try to get tunnel conn")
 	var conn *net.TCPConn
 	defer func() {
 		// 如果有连接,清空一下
 		if conn != nil {
 			clearTCPConn(conn)
 		}
+		logger.Infof("get tunnel conn %s success", conn.RemoteAddr())
 	}()
 	server.TunnelLock.Lock()
 	defer server.TunnelLock.Unlock()
