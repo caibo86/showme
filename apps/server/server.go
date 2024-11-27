@@ -173,12 +173,13 @@ func (server *Server) createTunnelChannel() {
 			continue
 		}
 		logger.Infof("tunnel accepted %s", conn.RemoteAddr())
-		server.addTunnelConn(conn)
+		go server.addTunnelConn(conn)
 	}
 }
 
 // 添加隧道连接
 func (server *Server) addTunnelConn(conn *net.TCPConn) {
+	clearTCPConn(conn)
 	server.TunnelLock.Lock()
 	defer server.TunnelLock.Unlock()
 	key := conn.RemoteAddr().String()
@@ -197,14 +198,6 @@ func (server *Server) addTunnelConn(conn *net.TCPConn) {
 func (server *Server) getTunnelConn() *net.TCPConn {
 	logger.Infof("try to get tunnel conn")
 	var conn *net.TCPConn
-	defer func() {
-		logger.Infof("try to clear tunnel conn")
-		// 如果有连接,清空一下
-		if conn != nil {
-			clearTCPConn(conn)
-		}
-		logger.Infof("get tunnel conn %s success", conn.RemoteAddr())
-	}()
 	server.TunnelLock.Lock()
 	defer server.TunnelLock.Unlock()
 	for _, c := range server.TunnelConns {
@@ -216,6 +209,11 @@ func (server *Server) getTunnelConn() *net.TCPConn {
 
 // 清空一下TCPConn
 func clearTCPConn(conn *net.TCPConn) {
+	err := conn.SetReadDeadline(time.Now().Add(time.Second))
+	if err != nil {
+		logger.Errorf("set read deadline err %s", err)
+		return
+	}
 	buffer := make([]byte, 1024)
 	for {
 		_, err := conn.Read(buffer)
@@ -224,4 +222,8 @@ func clearTCPConn(conn *net.TCPConn) {
 		}
 	}
 	logger.Infof("clear tcp conn %s", conn.RemoteAddr())
+	err = conn.SetReadDeadline(time.Time{})
+	if err != nil {
+		logger.Errorf("clear read deadline err %s", err)
+	}
 }
